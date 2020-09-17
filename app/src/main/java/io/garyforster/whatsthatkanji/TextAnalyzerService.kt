@@ -1,7 +1,6 @@
 package io.garyforster.whatsthatkanji
 
 import android.accessibilityservice.AccessibilityService
-import android.content.ContentValues.TAG
 import android.graphics.PixelFormat
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,12 +8,13 @@ import android.view.View
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
-import android.widget.TextView
 import org.atilika.kuromoji.Token
 import org.atilika.kuromoji.Tokenizer
+import se.fekete.furiganatextview.furiganaview.FuriganaTextView
+
+private const val TAG = "TextAnalyzerService"
 
 class TextAnalyzerService : AccessibilityService() {
-
     private val tokenizer = Tokenizer.builder().build()
     private var overlayView: View? = null
     private var wm: WindowManager? = null
@@ -25,13 +25,8 @@ class TextAnalyzerService : AccessibilityService() {
         super.onCreate()
         wm = applicationContext.getSystemService(WINDOW_SERVICE) as WindowManager
         val view: View = LayoutInflater.from(applicationContext).inflate(R.layout.overlay, null)
-//        overlayView?.findViewById(R.id.left).setOnClickListener(View.OnClickListener() {
-//
-//            override fun onClick(view: View) {
-//                Log.i()
-//            }
-//        });
         view.setOnClickListener(View.OnClickListener { removeLayout() })
+        Log.d("init", "here")
         overlayView = view
         layoutParams = WindowManager.LayoutParams(
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
@@ -47,6 +42,10 @@ class TextAnalyzerService : AccessibilityService() {
         Log.i("Files", filesDir.absolutePath)
 
         val tokens = getAllTokens(event.source)
+        if (tokens.isEmpty()) {
+            Log.d(TAG, "No tokens found")
+            return
+        }
         for (token in tokens) {
             if (token != null) {
                 Log.i("Token", token.surfaceForm)
@@ -57,10 +56,9 @@ class TextAnalyzerService : AccessibilityService() {
             addLayout()
         }
 
-        val output: String = tokens.map { token ->
-            if (token !== null) token.surfaceForm else ""
-        }.reduce { acc, form -> acc + form}
-        overlayView?.findViewById<TextView>(R.id.overlayText)?.text = output
+        val output: String = generateRuby(tokens)
+        val furiganaTextView = overlayView?.findViewById<FuriganaTextView>(R.id.overlayText)
+        furiganaTextView?.setFuriganaText(output)
     }
 
     override fun onDestroy() {
@@ -99,5 +97,21 @@ class TextAnalyzerService : AccessibilityService() {
             }
         }
         return tokens
+    }
+
+    private fun generateRuby(tokens: Array<Token?>): String {
+        return tokens
+            .map {
+                if (it === null) {
+                    ""
+                } else if(it.reading === null || it.reading === it.surfaceForm) {
+                    it.surfaceForm
+                } else {
+                    "<ruby>${it.surfaceForm}<rt>${it.reading}</rt></ruby>"
+                }
+
+            }
+            .joinToString("")
+
     }
 }

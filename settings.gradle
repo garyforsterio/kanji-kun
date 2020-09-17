@@ -1,2 +1,2 @@
-include ':app'
+include ':app', ':furiganatextview'
 rootProject.name = "What's that Kanji"
