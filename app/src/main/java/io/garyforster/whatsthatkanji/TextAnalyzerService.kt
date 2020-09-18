@@ -29,7 +29,6 @@ class TextAnalyzerService : AccessibilityService() {
         wm = applicationContext.getSystemService(WINDOW_SERVICE) as WindowManager
         val view: View = LayoutInflater.from(applicationContext).inflate(R.layout.overlay, null)
         view.setOnClickListener(View.OnClickListener { removeLayout() })
-        Log.d("init", "here")
         overlayView = view
         layoutParams = WindowManager.LayoutParams(
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
@@ -48,11 +47,6 @@ class TextAnalyzerService : AccessibilityService() {
         if (tokens.isEmpty()) {
             Log.d(TAG, "No tokens found")
             return
-        }
-        for (token in tokens) {
-            if (token != null) {
-                Log.i("Token", token.surfaceForm)
-            }
         }
 
         if (!overlayInView) {

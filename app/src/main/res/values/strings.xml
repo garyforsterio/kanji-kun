@@ -3,4 +3,6 @@
     <string name="accessibility_service_label">Kanji-Kun</string>
     <string name="accessibility_service_description">Reads any Japanese text on your screen to provide a reading aid in the form of furigana</string>
     <string name="open_settings_button">Open Settings</string>
+    <string name="settings_greeting">ようこそ～、I\'m Kanji-Kun!</string>
+    <string name="settings_introduction">So that I can help provide furigana I need your help to set me up as your assistant (I\'m an assessibility service)</string>
 </resources>
