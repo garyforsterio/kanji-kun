@@ -9,6 +9,7 @@
 
 - [Kuromoji](https://www.atilika.org/): Japanese morphological analyzer
 - [FuriganaTextView](https://github.com/lofe90/FuriganaTextView): Custom TextView for Android for rendering Japanese text with furigana.
+- [KanaConverter](http://mariten.github.io/kanatools-java/en/kana-converter/)
 
 ## Functionality
 

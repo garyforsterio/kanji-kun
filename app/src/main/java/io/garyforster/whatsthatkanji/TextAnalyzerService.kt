@@ -11,8 +11,11 @@ import android.view.accessibility.AccessibilityNodeInfo
 import org.atilika.kuromoji.Token
 import org.atilika.kuromoji.Tokenizer
 import se.fekete.furiganatextview.furiganaview.FuriganaTextView
+import com.mariten.kanatools.KanaConverter
 
 private const val TAG = "TextAnalyzerService"
+
+private val kanjiRange = '\u4e00'..'\u9faf'
 
 class TextAnalyzerService : AccessibilityService() {
     private val tokenizer = Tokenizer.builder().build()
@@ -58,6 +61,7 @@ class TextAnalyzerService : AccessibilityService() {
 
         val output: String = generateRuby(tokens)
         val furiganaTextView = overlayView?.findViewById<FuriganaTextView>(R.id.overlayText)
+        Log.d(TAG, output)
         furiganaTextView?.setFuriganaText(output)
     }
 
@@ -100,18 +104,17 @@ class TextAnalyzerService : AccessibilityService() {
     }
 
     private fun generateRuby(tokens: Array<Token?>): String {
-        return tokens
-            .map {
-                if (it === null) {
-                    ""
-                } else if(it.reading === null || it.reading === it.surfaceForm) {
-                    it.surfaceForm
-                } else {
-                    "<ruby>${it.surfaceForm}<rt>${it.reading}</rt></ruby>"
-                }
-
+        return tokens.joinToString("") {
+            if (it === null) {
+                ""
+            } else if (it.reading === null || it.reading === it.surfaceForm || it.surfaceForm[0] !in kanjiRange) {
+                //Log.d(TAG. it.surfaceForm)
+                "<ruby>${it.surfaceForm}</ruby>"
+            } else {
+                "<ruby>${it.surfaceForm}<rt>${KanaConverter.convertKana(it.reading, KanaConverter.OP_ZEN_KATA_TO_ZEN_HIRA)}</rt></ruby>"
             }
-            .joinToString("")
+
+        }
 
     }
 }
